@@ -1,0 +1,26 @@
+{
+  "name": "movr-ride-sim",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "prisma": {
+    "seed": "node --require esbuild-register prisma/seed.ts"
+  },
+  "scripts": {
+    "sim-crl-dbbq": "node --require esbuild-register ride-crl-dbbq.ts",
+    "sim-scooter-craig": "node --require esbuild-register ride-scooter-craig.ts",
+    "sim-skateboard-clark": "node --require esbuild-register ride-skateboard-clark.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^4.9.0"
+  },
+  "devDependencies": {
+    "esbuild-register": "^3.4.2",
+    "prisma": "^4.9.0",
+    "typescript": "^4.9.4"
+  }
+}

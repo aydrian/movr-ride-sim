@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+model promo_codes {
+  code            String    @id
+  description     String?
+  creation_time   DateTime? @db.Timestamp(6)
+  expiration_time DateTime? @db.Timestamp(6)
+  rules           Json?
+}
+
+model rides {
+  id                         String                       @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  city                       String
+  vehicle_city               String?
+  rider_id                   String?                      @db.Uuid
+  vehicle_id                 String?                      @db.Uuid
+  start_address              String?
+  end_address                String?
+  start_time                 DateTime?                    @db.Timestamp(6)
+  end_time                   DateTime?                    @db.Timestamp(6)
+  revenue                    Decimal?                     @db.Decimal(10, 2)
+  users                      users?                       @relation(fields: [city, rider_id], references: [city, id], onDelete: NoAction, onUpdate: NoAction)
+  vehicles                   vehicles?                    @relation(fields: [vehicle_city, vehicle_id], references: [city, id], onDelete: NoAction, onUpdate: NoAction)
+  vehicle_location_histories vehicle_location_histories[]
+
+  @@id([city, id])
+  @@index([city, rider_id], map: "rides_auto_index_fk_city_ref_users")
+  @@index([vehicle_city, vehicle_id], map: "rides_auto_index_fk_vehicle_city_ref_vehicles")
+}
+
+model user_promo_codes {
+  city        String
+  user_id     String    @db.Uuid
+  code        String
+  timestamp   DateTime? @db.Timestamp(6)
+  usage_count BigInt?
+  users       users     @relation(fields: [city, user_id], references: [city, id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([city, user_id, code])
+}
+
+model users {
+  id               String             @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  city             String
+  name             String?
+  address          String?
+  credit_card      String?
+  rides            rides[]
+  user_promo_codes user_promo_codes[]
+  vehicles         vehicles[]
+
+  @@id([city, id])
+}
+
+model vehicle_location_histories {
+  city      String
+  ride_id   String   @db.Uuid
+  timestamp DateTime @db.Timestamp(6)
+  lat       Float?
+  long      Float?
+  rides     rides    @relation(fields: [city, ride_id], references: [city, id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([city, ride_id, timestamp])
+}
+
+model vehicles {
+  id               String    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  city             String
+  type             String?
+  owner_id         String?   @db.Uuid
+  creation_time    DateTime? @db.Timestamp(6)
+  status           String?
+  current_location String?
+  ext              Json?
+  rides            rides[]
+  users            users?    @relation(fields: [city, owner_id], references: [city, id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([city, id])
+  @@index([city, owner_id], map: "vehicles_auto_index_fk_city_ref_users")
+}
