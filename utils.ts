@@ -1,15 +1,22 @@
 import type { Identity, Directions } from "./types";
 import { PrismaClient } from "@prisma/client";
+import { ResolvedTypeReferenceDirectiveWithFailedLookupLocations } from "typescript";
 const db = new PrismaClient();
 
 export function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+type simOptions = {
+  delay_ms?: number;
+  start_time?: Date; //TODO simulate in past
+};
+
 export async function simulateRide(
   user: Identity,
   vehicle: Identity,
-  directions: Directions
+  directions: Directions,
+  { delay_ms = 5000 }: simOptions = {}
 ) {
   console.log(
     `Simulating ride from ${directions.start_address} to ${directions.end_address}.`
@@ -39,7 +46,7 @@ export async function simulateRide(
   console.log(`${rider?.name} reserved a ${currentVehicle.type}`);
   console.log(`Starting ride from ${directions.start_address}`);
   for (const coords of directions.path) {
-    await delay(5000);
+    await delay(delay_ms);
     console.log(`Moving to: (${coords})`);
     await db.vehicle_location_histories.create({
       data: {
