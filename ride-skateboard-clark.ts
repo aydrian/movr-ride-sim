@@ -1,6 +1,6 @@
 import type { Identity } from "./types";
 import { simulateRide } from "./utils";
-import directions from "./directions/crl-dbbq.json";
+import directions from "./directions/sb-met.json";
 
 // Clark Koala
 const user: Identity = {
