@@ -14,4 +14,4 @@ const vehicle: Identity = {
   city: "new york"
 };
 
-simulateRide(user, vehicle, directions);
+simulateRide(user, vehicle, directions, { delay_ms: 2000 });
